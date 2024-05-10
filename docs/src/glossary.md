@@ -96,7 +96,7 @@ More generally, the control parameters could also be spectral coefficients (CRAB
 
 ##### Pulse Parametrization
 
-A special case of a [Control Amplitude)(@ref) where ``a(t) = a(ϵ(t))`` at every point in time. The purpose of this is to constrain the amplitude of the control amplitude ``a(t)``. See e.g. [`QuantumControl.PulseParametrizations.SquareParametrization`](@ref), where ``a(t) = ϵ^2(t)`` to ensure that ``a(t)`` is positive. Since Krotov's method inherently has no constraints on the optimized control fields, pulse parameterization is a method of imposing constraints on the amplitude in this context.
+A special case of a [Control Amplitude](@ref) where ``a(t) = a(ϵ(t))`` at every point in time. The purpose of this is to constrain the amplitude of the control amplitude ``a(t)``. See e.g. [`QuantumControl.PulseParametrizations.SquareParametrization`](@ref), where ``a(t) = ϵ^2(t)`` to ensure that ``a(t)`` is positive. Since Krotov's method inherently has no constraints on the optimized control fields, pulse parameterization is a method of imposing constraints on the amplitude in this context.
 
 ----
 
