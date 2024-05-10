@@ -14,14 +14,14 @@ Examples for supported forms a Hamiltonian are the following, from the most gene
 <img src="../assets/controlhams.svg" width="80%"/>
 ```
 
-In Eq. (G1), ``Ĥ_0`` is the [Drift Term](@ref) (which may be zero) and each term under the sum over ``l`` is a [Control Term](@ref). Each control term is a Hamiltonian that depends on a set of [control functions](#Control-Function) (or simply "controls"). The controls are the functions directly tunable via optimal control.
+In Eq. (G1), ``Ĥ_0`` is the [Drift Term](@ref) (which may be zero) and each term under the sum over ``l`` is a [Control Term](@ref). Each control term is a Hamiltonian that depends on a set of [control functions](#Control-Function) (or simply "controls"). The controls are the functions directly tunable via optimal control.
 The control term may also contain an explicit time dependence outside of the controls. This most general form (G1) is supported only via custom user-implemented generator objects, see the documentation of the [QuantumPropagators package](https://juliaquantumcontrol.github.io/QuantumPropagators.jl/stable/).
 
-More commonly, each control term is separable into the [Control Amplitude](@ref) ``a_l(t)`` and the [Control Operator](@ref) ``Ĥ_l``, as in Eq. (G2). This is the most general form supported by the built-in [`Generator`](@ref) object, which can be initialized via the [`hamiltonian`](@ref) or [`liouvillian`](@ref) functions. The control amplitude ``a_l(t)`` depends in turn on one ore more function ``\{ϵ_{l'}(t)\}``, where each ``ϵ_{l'}(t)`` is as [Control Function](@ref). It may also contain an explicit time dependence.
+More commonly, each control term is separable into the [Control Amplitude](@ref) ``a_l(t)`` and the [Control Operator](@ref) ``Ĥ_l``, as in Eq. (G2). This is the most general form supported by the built-in [`Generator`](@ref) object, which can be initialized via the [`hamiltonian`](@ref) or [`liouvillian`](@ref) functions. The control amplitude ``a_l(t)`` depends in turn on one ore more function ``\{ϵ_{l'}(t)\}``, where each ``ϵ_{l'}(t)`` is as [Control Function](@ref). It may also contain an explicit time dependence.
 
-In the most common case, ``a_l ≡ ϵ_l``, as in Eq. (G3). The control may further depend on a set of [Control Parameters](@ref), ``ϵ_l(t) = ϵ_l({u_n})``.
+In the most common case, ``a_l ≡ ϵ_l``, as in Eq. (G3). The control may further depend on a set of [Control Parameters](@ref), ``ϵ_l(t) = ϵ_l({u_n})``.
 
-In an open quantum system, the structure of Eqs. (G1–G3) is the same, but with Liouvillian (super-)operators acting on density matrices instead of Hamiltonians acting on state vectors. See [`liouvillian`](@ref) with `convention=:TDSE`.
+In an open quantum system, the structure of Eqs. (G1–G3) is the same, but with Liouvillian (super-)operators acting on density matrices instead of Hamiltonians acting on state vectors. See [`liouvillian`](@ref) with `convention=:TDSE`.
 
 
 ----
@@ -58,7 +58,7 @@ A function that corresponds directly to some kind of *physical* drive (laser amp
 
 ##### Control Operator
 
-(aka "control Hamiltonian/Liouvillian"). The operator ``Ĥ_l`` in Eqs. (G2, G3). This is a *static* operator which forms the [Control Term](@ref) together with a [Control Amplitude](@ref). The control generator is not a well-defined concept in the most general case of non-separable controls terms, Eq. (G1).
+(aka "control Hamiltonian/Liouvillian"). The operator ``Ĥ_l`` in Eqs. (G2, G3). This is a *static* operator which forms the [Control Term](@ref) together with a [Control Amplitude](@ref). The control generator is not a well-defined concept in the most general case of non-separable controls terms, Eq. (G1).
 
 
 ----
@@ -66,7 +66,7 @@ A function that corresponds directly to some kind of *physical* drive (laser amp
 
 ##### Control Amplitude
 
-The time-dependent coefficient ``a_l(t)`` for the [Control Operator](@ref) in Eq. (G2). A control amplitude may depend on on or more control functions, as well as have an explicit time dependency. Some conceptual examples for control amplitudes and how they may depend on a [Control Function](@ref) are the following:
+The time-dependent coefficient ``a_l(t)`` for the [Control Operator](@ref) in Eq. (G2). A control amplitude may depend on on or more control functions, as well as have an explicit time dependency. Some conceptual examples for control amplitudes and how they may depend on a [Control Function](@ref) are the following:
 
 * Non-linear coupling of a control field to the operator, e.g., the quadratic coupling of the laser field to a Stark shift operator
 * [Pulse Parametrization](@ref) as a way to enforce bounds on a [Control Field](@ref)
@@ -96,13 +96,13 @@ More generally, the control parameters could also be spectral coefficients (CRAB
 
 ##### Pulse Parametrization
 
-A special case of a [Control Amplitude)(@ref) where ``a(t) = a(ϵ(t))`` at every point in time. The purpose of this is to constrain the amplitude of the control amplitude ``a(t)``. See e.g. [`QuantumControl.PulseParametrizations.SquareParametrization`](@ref), where ``a(t) = ϵ^2(t)`` to ensure that ``a(t)`` is positive. Since Krotov's method inherently has no constraints on the optimized control fields, pulse parameterization is a method of imposing constraints on the amplitude in this context.
+A special case of a [Control Amplitude](@ref) where ``a(t) = a(ϵ(t))`` at every point in time. The purpose of this is to constrain the amplitude of the control amplitude ``a(t)``. See e.g. [`QuantumControl.PulseParametrizations.SquareParametrization`](@ref), where ``a(t) = ϵ^2(t)`` to ensure that ``a(t)`` is positive. Since Krotov's method inherently has no constraints on the optimized control fields, pulse parameterization is a method of imposing constraints on the amplitude in this context.
 
 ----
 
 ##### Control Derivative
 
-The derivative of the dynamical [Generator](@ref) with respect to the control ``ϵ(t)``. In the case of linear controls terms in Eq. (G3), the control derivative is the [Control Operator](@ref) coupling to ``ϵ(t)``. In general, however, for non-linear control terms, the control derivatives still depends on the control fields and is thus time dependent. We commonly use the symbol ``μ`` for the control derivative (reminiscent of the dipole operator)
+The derivative of the dynamical [Generator](@ref) with respect to the control ``ϵ(t)``. In the case of linear controls terms in Eq. (G3), the control derivative is the [Control Operator](@ref) coupling to ``ϵ(t)``. In general, however, for non-linear control terms, the control derivatives still depends on the control fields and is thus time dependent. We commonly use the symbol ``μ`` for the control derivative (reminiscent of the dipole operator)
 
 ----
 
