@@ -29,7 +29,7 @@ using IOCapture
     H2 = random_matrix(N; hermitian=true)
 
     ϵ(t) = 0.5
-    a = ParameterizedAmplitude(ϵ; parametrization=SquareParameterization())
+    a = ParameterizedAmplitude(ϵ; parameterization=SquareParameterization())
     @test get_controls(a) == (ϵ,)
 
     H = hamiltonian(H0, (H1, ϵ), (H2, a); check=false)
@@ -39,10 +39,10 @@ using IOCapture
 
 end
 
-@testset "Positive parametrizations" begin
+@testset "Positive parameterizations" begin
 
     # See figure at
-    # https://juliaquantumcontrol.github.io/QuantumControlExamples.jl/stable/tutorials/krotov_pulse_parametrization/#Positive-(Bounded)-Controls
+    # https://juliaquantumcontrol.github.io/QuantumControlExamples.jl/stable/tutorials/krotov_pulse_parameterization/#Positive-(Bounded)-Controls
 
     u_vals = collect(range(-3, 3, length=101))
     ϵ_vals = collect(range(0, 1, length=101))
@@ -99,10 +99,10 @@ end
 end
 
 
-@testset "Symmetric parametrizations" begin
+@testset "Symmetric parameterizations" begin
 
     # See figure at
-    # https://juliaquantumcontrol.github.io/QuantumControlExamples.jl/stable/tutorials/krotov_pulse_parametrization/#Symmetric-Bounded-Controls
+    # https://juliaquantumcontrol.github.io/QuantumControlExamples.jl/stable/tutorials/krotov_pulse_parameterization/#Symmetric-Bounded-Controls
 
     u_vals = collect(range(-3, 3, length=101))
     ϵ_vals = collect(range(-1, 1, length=101))
@@ -174,7 +174,7 @@ end
     a = ParameterizedAmplitude(
         ϵ,
         tlist;
-        parametrization=TanhParameterization(-0.5, 0.5),
+        parameterization=TanhParameterization(-0.5, 0.5),
         parameterize=true
     )
 
