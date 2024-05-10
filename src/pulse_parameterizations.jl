@@ -1,11 +1,11 @@
-module PulseParametrizations
+module PulseParameterizations
 
-export SquareParametrization,
-    TanhParametrization,
-    TanhSqParametrization,
-    LogisticParametrization,
-    LogisticSqParametrization,
-    ParametrizedAmplitude
+export SquareParameterization,
+    TanhParameterization,
+    TanhSqParameterization,
+    LogisticParameterization,
+    LogisticSqParameterization,
+    ParameterizedAmplitude
 
 using QuantumPropagators.Controls: discretize_on_midpoints
 using QuantumPropagators.Amplitudes: ControlAmplitude, ShapedAmplitude
@@ -17,15 +17,15 @@ import QuantumControlBase: get_control_deriv
 #! format: off
 
 
-"""Specification for a "time-local" pulse parametrization.
+"""Specification for a "time-local" pulse parameterization.
 
-The parametrization is given as a collection of three functions:
+The parameterization is given as a collection of three functions:
 
 * ``a(ϵ(t))``
 * ``ϵ(a(t))``
 * ``∂a/∂ϵ`` as a function of ``ϵ(t)``.
 """
-struct PulseParametrization
+struct PulseParameterization
     name::String
     a_of_epsilon::Function
     epsilon_of_a::Function
@@ -33,14 +33,14 @@ struct PulseParametrization
 end
 
 
-function Base.show(io::IO, p::PulseParametrization)
+function Base.show(io::IO, p::PulseParameterization)
     print(io, p.name)
 end
 
 
-"""Parametrization a(t) = ϵ²(t), enforcing pulse values ``a(t) ≥ 0``."""
-SquareParametrization() = PulseParametrization(
-    "SquareParametrization()",
+"""Parameterization a(t) = ϵ²(t), enforcing pulse values ``a(t) ≥ 0``."""
+SquareParameterization() = PulseParameterization(
+    "SquareParameterization()",
     ϵ -> begin # a_of_epsilon
         a = ϵ^2
     end,
@@ -54,17 +54,17 @@ SquareParametrization() = PulseParametrization(
 )
 
 
-"""Parametrization with a tanh function that enforces `a_min < a(t) < a_max`.
+"""Parameterization with a tanh function that enforces `a_min < a(t) < a_max`.
 """
-function TanhParametrization(a_min, a_max)
+function TanhParameterization(a_min, a_max)
 
     Δ = a_max - a_min
     Σ = a_max + a_min
     aₚ = eps(1.0)  # 2⋅10⁻¹⁶ (machine precision)
     @assert a_max > a_min
 
-    PulseParametrization(
-        "TanhParametrization($a_min, $a_max)",
+    PulseParameterization(
+        "TanhParameterization($a_min, $a_max)",
         ϵ -> begin # a_of_epsilon
             a = tanh(ϵ) * Δ / 2 + Σ / 2
         end,
@@ -80,15 +80,15 @@ function TanhParametrization(a_min, a_max)
 end
 
 
-"""Parametrization with a tanh² function that enforces `0 ≤ a(t) < a_max`.
+"""Parameterization with a tanh² function that enforces `0 ≤ a(t) < a_max`.
 """
-function TanhSqParametrization(a_max)
+function TanhSqParameterization(a_max)
 
     aₚ = eps(1.0)  # 2⋅10⁻¹⁶ (machine precision)
     @assert a_max > 0
 
-    PulseParametrization(
-        "TanhSqParametrization($a_max)",
+    PulseParameterization(
+        "TanhSqParameterization($a_max)",
         ϵ -> begin # a_of_epsilon
             a = a_max * tanh(ϵ)^2
         end,
@@ -105,16 +105,16 @@ end
 
 
 """
-Parametrization with a Logistic function that enforces `a_min < a(t) < a_max`.
+Parameterization with a Logistic function that enforces `a_min < a(t) < a_max`.
 """
-function LogisticParametrization(a_min, a_max; k=1.0)
+function LogisticParameterization(a_min, a_max; k=1.0)
 
     Δ = a_max - a_min
     a₀ = eps(0.0)  # 5⋅10⁻³²⁴
     @assert a_max > a_min
 
-    PulseParametrization(
-        "LogisticParametrization($a_max, $a_max; k=$k)",
+    PulseParameterization(
+        "LogisticParameterization($a_max, $a_max; k=$k)",
         ϵ -> begin # a_of_epsilon
             a = Δ / (1 + exp(-k * ϵ)) + a_min
         end,
@@ -124,6 +124,7 @@ function LogisticParametrization(a_min, a_max; k=1.0)
             ϵ = log(a) / k
         end,
         ϵ -> begin # da_deps_derivative
+
             e⁻ᵏᵘ = exp(-k * ϵ)
             ∂a╱∂ϵ = Δ * k * e⁻ᵏᵘ / (1 + e⁻ᵏᵘ)^2
         end
@@ -133,15 +134,15 @@ end
 
 
 """
-Parametrization with a Logistic-Square function that enforces `0 ≤ a(t) < a_max`.
+Parameterization with a Logistic-Square function that enforces `0 ≤ a(t) < a_max`.
 """
-function LogisticSqParametrization(a_max; k=1.0)
+function LogisticSqParameterization(a_max; k=1.0)
 
     a₀ = eps(0.0)  # 5⋅10⁻³²⁴
     @assert a_max > 0
 
-    PulseParametrization(
-        "LogisticSqParametrization($a_max; k=$k)",
+    PulseParameterization(
+        "LogisticSqParameterization($a_max; k=$k)",
         ϵ -> begin # a_of_epsilon
             a = a_max * (2 / (1 + exp(-k * ϵ)) - 1)^2
         end,
@@ -162,28 +163,28 @@ end
 #! format: on
 
 
-#### ParametrizedAmplitude ####################################################
+#### ParameterizedAmplitude ####################################################
 
 
-"""An amplitude determined by a pulse parametrization.
+"""An amplitude determined by a pulse parameterization.
 
 That is, ``a(t) = a(ϵ(t))`` with a bijective mapping between the value of
-``a(t)`` and ``ϵ(t)``, e.g. ``a(t) = ϵ^2(t)`` (a [`SquareParametrization`](@ref
-SquareParametrization)). Optionally, the amplitude may be multiplied with an
-additional shape function, cf. [`ShapedAmplitude`](@ref).
+``a(t)`` and ``ϵ(t)``, e.g. ``a(t) = ϵ^2(t)`` (a [`SquareParameterization`](@ref
+SquareParameterization)). Optionally, the amplitude may be multiplied with an
+additional shape function, cf. [`ShapedAmplitude`](@ref).
 
 
 ```julia
-ampl = ParametrizedAmplitude(control; parametrization)
+ampl = ParameterizedAmplitude(control; parameterization)
 ```
 
 initializes ``a(t) = a(ϵ(t)`` where ``ϵ(t)`` is the `control`, and the mandatory
-keyword argument `parametrization` is a [`PulseParametrization`](@ref
-PulseParametrization). The `control` must either be a vector of values
+keyword argument `parameterization` is a [`PulseParameterization`](@ref
+PulseParameterization). The `control` must either be a vector of values
 discretized to the midpoints of a time grid, or a callable `control(t)`.
 
 ```julia
-ampl = ParametrizedAmplitude(control; parametrization, shape=shape)
+ampl = ParameterizedAmplitude(control; parameterization, shape=shape)
 ```
 
 initializes ``a(t) = S(t) a(ϵ(t))`` where ``S(t)`` is the given `shape`. It
@@ -192,7 +193,7 @@ must be a vector if `control` is a vector, or a callable `shape(t)` if
 
 
 ```julia
-ampl = ParametrizedAmplitude(control, tlist; parametrization, shape=shape)
+ampl = ParameterizedAmplitude(control, tlist; parameterization, shape=shape)
 ```
 
 discretizes `control` and `shape` (if given) to the midpoints of `tlist` before
@@ -200,8 +201,8 @@ initialization.
 
 
 ```julia
-ampl = ParametrizedAmplitude(
-    amplitude, tlist; parametrization, shape=shape, parametrize=true
+ampl = ParameterizedAmplitude(
+    amplitude, tlist; parameterization, shape=shape, parameterized=true
 )
 ```
 
@@ -209,152 +210,152 @@ initializes ``ã(t) = S(t) a(t)`` where ``a(t)`` is the input `amplitude`.
 First, if `amplitude` is a callable `amplitude(t)`, it is discretized to the
 midpoints of `tlist`. Then, a `control` ``ϵ(t)`` is calculated so that ``a(t) ≈
 a(ϵ(t))``. Clippling may occur if the values in `amplitude` cannot represented
-with the given `parametrization`. Lastly, `ParametrizedAmplitude(control;
-parametrization, shape)` is initialized with the calculated `control`.
+with the given `parameterization`. Lastly, `ParameterizedAmplitude(control;
+parameterization, shape)` is initialized with the calculated `control`.
 
-Note that the `tlist` keyword argument is required when `parametrize=true` is
+Note that the `tlist` keyword argument is required when `parameterized=true` is
 given, even if `amplitude` is already a vector.
 """
-abstract type ParametrizedAmplitude <: ControlAmplitude end
+abstract type ParameterizedAmplitude <: ControlAmplitude end
 
-abstract type ShapedParametrizedAmplitude <: ParametrizedAmplitude end
+abstract type ShapedParameterizedAmplitude <: ParameterizedAmplitude end
 
-function ParametrizedAmplitude(
+function ParameterizedAmplitude(
     control;
-    parametrization::PulseParametrization,
+    parameterization::PulseParameterization,
     shape=nothing
 )
     if isnothing(shape)
         if control isa Vector{Float64}
-            return ParametrizedPulseAmplitude(control, parametrization)
+            return ParameterizedPulseAmplitude(control, parameterization)
         else
             try
                 ϵ_t = control(0.0)
             catch
                 error(
-                    "A ParametrizedAmplitude control must either be a vector of values or a callable"
+                    "A ParameterizedAmplitude control must either be a vector of values or a callable"
                 )
             end
-            return ParametrizedContinuousAmplitude(control, parametrization)
+            return ParameterizedContinuousAmplitude(control, parameterization)
         end
     else
         if (control isa Vector{Float64}) && (shape isa Vector{Float64})
-            return ShapedParametrizedPulseAmplitude(control, shape)
+            return ShapedParameterizedPulseAmplitude(control, shape)
         else
             try
                 ϵ_t = control(0.0)
             catch
                 error(
-                    "A ParametrizedAmplitude control must either be a vector of values or a callable"
+                    "A ParameterizedAmplitude control must either be a vector of values or a callable"
                 )
             end
             try
                 S_t = shape(0.0)
             catch
                 error(
-                    "A ParametrizedAmplitude shape must either be a vector of values or a callable"
+                    "A ParameterizedAmplitude shape must either be a vector of values or a callable"
                 )
             end
-            return ShapedParametrizedContinuousAmplitude(control, shape)
+            return ShapedParameterizedContinuousAmplitude(control, shape)
         end
     end
 end
 
 
-function ParametrizedAmplitude(
+function ParameterizedAmplitude(
     control,
     tlist;
-    parametrization::PulseParametrization,
+    parameterization::PulseParameterization,
     shape=nothing,
     parameterize=false
 )
     control = discretize_on_midpoints(control, tlist)
     if parameterize
-        control = parametrization.epsilon_of_a.(control)
+        control = parameterization.epsilon_of_a.(control)
     end
     if !isnothing(shape)
         shape = discretize_on_midpoints(shape, tlist)
     end
-    return ParametrizedAmplitude(control; parametrization, shape)
+    return ParameterizedAmplitude(control; parameterization, shape)
 end
 
-function Base.show(io::IO, ampl::ParametrizedAmplitude)
+function Base.show(io::IO, ampl::ParameterizedAmplitude)
     print(
         io,
-        "ParametrizedAmplitude(::$(typeof(ampl.control)); parametrization=$(ampl.parametrization))"
+        "ParameterizedAmplitude(::$(typeof(ampl.control)); parameterization=$(ampl.parameterization))"
     )
 end
 
-function Base.show(io::IO, ampl::ShapedParametrizedAmplitude)
+function Base.show(io::IO, ampl::ShapedParameterizedAmplitude)
     print(
         io,
-        "ParametrizedAmplitude(::$(typeof(ampl.control)); parametrization=$(ampl.parametrization), shape::$(typeof(ampl.shape)))"
+        "ParameterizedAmplitude(::$(typeof(ampl.control)); parameterization=$(ampl.parameterization), shape::$(typeof(ampl.shape)))"
     )
 end
 
-struct ParametrizedPulseAmplitude <: ParametrizedAmplitude
+struct ParameterizedPulseAmplitude <: ParameterizedAmplitude
     control::Vector{Float64}
-    parametrization::PulseParametrization
+    parameterization::PulseParameterization
 end
 
-function Base.Array(ampl::ParametrizedPulseAmplitude)
-    return ampl.parametrization.a_of_epsilon.(ampl.control)
+function Base.Array(ampl::ParameterizedPulseAmplitude)
+    return ampl.parameterization.a_of_epsilon.(ampl.control)
 end
 
-struct ParametrizedContinuousAmplitude <: ParametrizedAmplitude
+struct ParameterizedContinuousAmplitude <: ParameterizedAmplitude
     control
-    parametrization::PulseParametrization
+    parameterization::PulseParameterization
 end
 
-struct ShapedParametrizedPulseAmplitude <: ShapedParametrizedAmplitude
+struct ShapedParameterizedPulseAmplitude <: ShapedParameterizedAmplitude
     control::Vector{Float64}
     shape::Vector{Float64}
-    parametrization::PulseParametrization
+    parameterization::PulseParameterization
 end
 
-struct ShapedParametrizedContinuousAmplitude <: ShapedParametrizedAmplitude
+struct ShapedParameterizedContinuousAmplitude <: ShapedParameterizedAmplitude
     control
     shape
-    parametrization::PulseParametrization
+    parameterization::PulseParameterization
 end
 
 
-function evaluate(ampl::ParametrizedAmplitude, args...; kwargs...)
+function evaluate(ampl::ParameterizedAmplitude, args...; kwargs...)
     ϵ = evaluate(ampl.control, args...; kwargs...)
-    return ampl.parametrization.a_of_epsilon(ϵ)
+    return ampl.parameterization.a_of_epsilon(ϵ)
 end
 
 
-function evaluate(ampl::ShapedParametrizedAmplitude, args...; kwargs...)
+function evaluate(ampl::ShapedParameterizedAmplitude, args...; kwargs...)
     ϵ = evaluate(ampl.control, args...; kwargs...)
     S = evaluate(ampl.shape, args...; kwargs...)
-    return S * ampl.parametrization.a_of_epsilon(ϵ)
+    return S * ampl.parameterization.a_of_epsilon(ϵ)
 end
 
 
-function Base.Array(ampl::ShapedParametrizedPulseAmplitude)
-    return ampl.shape .* ampl.parametrization.a_of_epsilon.(ampl.control)
+function Base.Array(ampl::ShapedParameterizedPulseAmplitude)
+    return ampl.shape .* ampl.parameterization.a_of_epsilon.(ampl.control)
 end
 
 
-function get_controls(ampl::ParametrizedAmplitude)
+function get_controls(ampl::ParameterizedAmplitude)
     return (ampl.control,)
 end
 
 
-function get_control_deriv(ampl::ParametrizedAmplitude, control)
+function get_control_deriv(ampl::ParameterizedAmplitude, control)
     if control ≡ ampl.control
-        return ParametrizationDerivative(control, ampl.parametrization.da_deps_derivative)
+        return ParameterizationDerivative(control, ampl.parameterization.da_deps_derivative)
     else
         return 0.0
     end
 end
 
-function get_control_deriv(ampl::ShapedParametrizedPulseAmplitude, control)
+function get_control_deriv(ampl::ShapedParameterizedPulseAmplitude, control)
     if control ≡ ampl.control
-        return ShapedParametrizationPulseDerivative(
+        return ShapedParameterizationPulseDerivative(
             control,
-            ampl.parametrization.da_deps_derivative,
+            ampl.parameterization.da_deps_derivative,
             ampl.shape
         )
     else
@@ -362,11 +363,11 @@ function get_control_deriv(ampl::ShapedParametrizedPulseAmplitude, control)
     end
 end
 
-function get_control_deriv(ampl::ShapedParametrizedContinuousAmplitude, control)
+function get_control_deriv(ampl::ShapedParameterizedContinuousAmplitude, control)
     if control ≡ ampl.control
-        return ShapedParametrizationContinuousDerivative(
+        return ShapedParameterizationContinuousDerivative(
             control,
-            ampl.parametrization.da_deps_derivative,
+            ampl.parameterization.da_deps_derivative,
             ampl.shape
         )
     else
@@ -375,36 +376,36 @@ function get_control_deriv(ampl::ShapedParametrizedContinuousAmplitude, control)
 end
 
 
-struct ParametrizationDerivative <: ControlAmplitude
+struct ParameterizationDerivative <: ControlAmplitude
     control
     func
 end
 
-struct ShapedParametrizationPulseDerivative <: ControlAmplitude
+struct ShapedParameterizationPulseDerivative <: ControlAmplitude
     control::Vector{Float64}
     func
     shape::Vector{Float64}
 end
 
-struct ShapedParametrizationContinuousDerivative <: ControlAmplitude
+struct ShapedParameterizationContinuousDerivative <: ControlAmplitude
     control
     func
     shape
 end
 
-function evaluate(deriv::ParametrizationDerivative, args...; vals_dict=IdDict())
+function evaluate(deriv::ParameterizationDerivative, args...; vals_dict=IdDict())
     ϵ = evaluate(deriv.control, args...; vals_dict)
     return deriv.func(ϵ)
 end
 
-function evaluate(deriv::ShapedParametrizationPulseDerivative, tlist, n; vals_dict=IdDict())
+function evaluate(deriv::ShapedParameterizationPulseDerivative, tlist, n; vals_dict=IdDict())
     ϵ = evaluate(deriv.control, tlist, n; vals_dict)
     S = evaluate(deriv.shape, tlist, n; vals_dict)
     return S * deriv.func(ϵ)
 end
 
 function evaluate(
-    deriv::ShapedParametrizationContinuousDerivative,
+    deriv::ShapedParameterizationContinuousDerivative,
     tlist,
     n;
     vals_dict=IdDict()
