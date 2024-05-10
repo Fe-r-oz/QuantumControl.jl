@@ -124,7 +124,6 @@ function LogisticParameterization(a_min, a_max; k=1.0)
             ϵ = log(a) / k
         end,
         ϵ -> begin # da_deps_derivative
-
             e⁻ᵏᵘ = exp(-k * ϵ)
             ∂a╱∂ϵ = Δ * k * e⁻ᵏᵘ / (1 + e⁻ᵏᵘ)^2
         end
