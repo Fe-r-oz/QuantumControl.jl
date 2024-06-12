@@ -201,7 +201,7 @@ initialization.
 
 ```julia
 ampl = ParameterizedAmplitude(
-    amplitude, tlist; parameterization, shape=shape, parametrize=true
+    amplitude, tlist; parameterization, shape=shape, parameterize=true
 )
 ```
 
@@ -212,7 +212,7 @@ a(ϵ(t))``. Clippling may occur if the values in `amplitude` cannot represented
 with the given `parameterization`. Lastly, `ParameterizedAmplitude(control;
 parameterization, shape)` is initialized with the calculated `control`.
 
-Note that the `tlist` keyword argument is required when `parametrize=true` is
+Note that the `tlist` keyword argument is required when `parameterize=true` is
 given, even if `amplitude` is already a vector.
 """
 abstract type ParameterizedAmplitude <: ControlAmplitude end
