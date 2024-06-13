@@ -397,7 +397,12 @@ function evaluate(deriv::ParameterizationDerivative, args...; vals_dict=IdDict()
     return deriv.func(ϵ)
 end
 
-function evaluate(deriv::ShapedParameterizationPulseDerivative, tlist, n; vals_dict=IdDict())
+function evaluate(
+    deriv::ShapedParameterizationPulseDerivative,
+    tlist,
+    n;
+    vals_dict=IdDict()
+)
     ϵ = evaluate(deriv.control, tlist, n; vals_dict)
     S = evaluate(deriv.shape, tlist, n; vals_dict)
     return S * deriv.func(ϵ)
